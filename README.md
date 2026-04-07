@@ -1,16 +1,43 @@
-# React + Vite
+এসাইনমেন্টে আপনাকে যা যা করতে হবেঃ
+✓ "login.html" "register.html" এবং "register-company.html" ফাইল গুলো React-এ কনভার্ট করতে হবে। ইউজাররা "/login" এবং "/register" রাউটে গিয়ে লগইন এবং রেজিস্টার করতে পারবে। ইউজার কে Authorize করার জন্যে JWT (JSON Web Token) ব্যবহার করতে হবে।
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+✓ Loggedin User এর ধরনের উপর ভিত্তি করে Navbar এ সংশ্লিষ্ট মেনু দেখাতে হবে, যেন Navbar থেকে Navigation করা যায় । এবং সেই সাথে ইউজার লগআউট করার ফিচার দিতে হবে ।
 
-Currently, two official plugins are available:
+✓ হোম পেজে পেজিনেশন আকারে জব নিয়ে এসে দেখাতে হবে । ইউজার যেকোনো জব সার্চ, ফিল্টার এবং সর্ট করতে পারবে।
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+✓ হোম বা Job Details পেজ বা অন্যান্য পেজ থেকে কেউ "Apply Now" বাটনে ক্লিক করলে তাকে কনফার্মেশন মোডাল/ডায়ালগ দেখাতে হবে । এবং ইউজার কে একটা Text Area তে Cover Letter লিখে সাবমিট করতে হবে । ইউজার যেই জব এ এপ্লাই করে ফেলেছেন, সেই জব এ "Apply Now" এর পরিবর্তে "Withdraw Application" বাটন দেখাতে হবে । এবং সেই বাটন এর ফিচার ইমপ্লিমেন্ট করতে হবে ।
 
-## React Compiler
+✓ Job Seeker এর সংশ্লিষ্ট পেজ গুলো সঠিক ভাবে Implement করতে হবে -
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+"user-profile.html" পেজে ইউজার এর যাবতীয় ইনফরমেশন (যা যা API থেকে পাওয়া যাবে) সেগুলো দেখাতে হবে ।
 
-## Expanding the ESLint configuration
+"user-dashboard.html" পেজে কিছু Recent Applications দেখাতে হবে, সেই সাথে Recommended জব গুলো নিয়ে এসে দেখাতে হবে । কিন্তু Job Seeker এর প্রোফাইল Information এর উপর নির্ভর করে Recommendation API কোনো কিছু নাও দিতে পারে।
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+"applied-jobs.html" পেজে ইউজার যে সকল জবে এপ্লাই করেছে সেগুলো লিস্ট করে দেখাতে হবে । সেগুলো চাইলে বিভিন্ন প্যারামিটার দিয়ে ফিল্টার করা যাবে এবং সর্টিং করা যাবে ।
+
+"edit-user-profile.html" দিয়ে ইউজার তার প্রোফাইল এডিট করতে পারবে, সেখানে ছবি & CV আপলোড করার ফিচার Implement করতে হবে ।
+
+✓ Company সংশ্লিষ্ট পেজ গুলো সঠিক ভাবে Implement করতে হবে -
+
+applicants.html পেজে কোম্পানিতে আসা সব গুলো CV/Resume Submission গুলো লিস্ট আকারে দেখাবে, সেখানে Company Employee বিভিন্ন প্যারামিটার দিয়ে ফিল্টার এবং সর্টিং করতে পারবে ।
+
+company-dashboard.html এ Company সংশ্লিষ্ট সব কিছুর সামারি থাকবে যেমন Recent Job Posts (৫ টা ), Recent Submissions এবং Stats দেখাবে ।
+
+company-profile.html এ কোম্পানির প্রোফাইল দেখা যাবে। এই পেজে কোম্পানির সকল তথ্য গুলো দেখাতে হবে । এবং Share Button এ ক্লিক করলে এই পেজের Link Clipboard এ কপি হয়ে যাবে ।
+
+company-settings.html পেজে Job Seeker Edit পেজের মতই সব ফর্ম আকারে থাকবে, শুধু মাত্র Logged in Company User তার Company এর তথ্য পরিবর্তন করতে পারবে ।
+
+create-job.html পেজের মাধ্যমে Company নতুন জব পোষ্ট তৈরি করতে পারবে, যেন Job Seeker সেখানে Apply করতে পারে ।
+
+manage-jobs.html পেজের মাধ্যমে Company User তার পোষ্ট করা জব গুলো সার্চ, সর্ট, ফিল্টার, এডিট, ডিলেট করতে পারবে ।
+
+সামগ্রিক নির্দেশনা এবং বিধিনিষেধঃ
+এই এসাইনমেন্ট এ অনেক Requirement উহ্য রয়েছে । একজন ইউজার এর Perspective থেকে চিন্তা করে সেগুলো Implement করতে হবে । যেমনঃ কিছু পেজ লগইন ছাড়া যে কেউ দেখতে পারবে, আবার কিছু পেজ এর কিছু অংশ বা ফিচার ব্যবহার করতে লগইন করতে হবে । সেগুলো আপনাকে নিজেকে identify করতে হবে । এবং ইউজারের জার্নি কেমন হবে সেগুলো আপনাকে সিদ্ধান্ত নিতে হবে ।
+
+Assignment শুরু করার পূর্বে বিভিন্ন Job Portal যেমন - Indeed, Glassdoor, Wellfound ইত্যাদি সাইট গুলো থেকে ইউজার জার্নি সম্পর্কে কিছুটা আইডিয়ে নিয়ে, তারপর খুব ভালো ভাবে Backend API দেখে নিয়ে তারপর এসাইনমেন্ট শুরু করতে হবে ।
+
+কিছু পেজ আছে যেগুলো পাবলিক, কিছু পেজ আছে যেগুলো শুধু মাত্র Logged In User ই access করতে পারবে । আবার কিছু পেজ আছে শুধু Company Access করতে পারবে । সেই জিনিস গুলো আপনাকে সিদ্ধান্ত নিতে হবে । যদি Unauthorized কেউ, কোন পেজে চলে যায়, তাহলে তার জার্নি কেমন হবে । এ সকল সিদ্ধান্ত আপনাকে নিতে হবে ।
+
+.env ফাইল অবশ্যই আপনাকে রিপোজিটোরিতে পুশ করতে হবে যেন আমরা পুরো প্রজেক্ট রান করে দেখতে পারি।
+
+আপনি এই এসাইনমেন্টে যত বেশি বেস্ট প্র্যাকটিস, ইনোভেশন করতে পারবেন, তত বেশি মার্ক পাবেন। Extraordinary কাজের জন্য আমরা বোনাস মার্কও দিয়ে দিতে পারি। এখানে "Sky is the limit" ! তাই সুন্দর করে, সাজিয়ে গুছিয়ে, কোর্সে এখন পর্যন্ত বলা সকল কথা কাজে লাগিয়ে বেস্ট আউটপুট নিয়ে আসার চেষ্টা করুন।
