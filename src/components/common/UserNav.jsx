@@ -34,7 +34,7 @@ const handleLogout=()=>{
                             >Dashboard</a
                         >
                         <a
-                            href="applied-jobs.html"
+                            href="/my-applications"
                             className="text-sm font-medium text-[hsl(var(--color-muted-foreground))] transition-colors hover:text-[hsl(var(--color-primary))]"
                             >My Applications</a
                         >
