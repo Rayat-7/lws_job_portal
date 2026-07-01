@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+import React from 'react'
+
+const CreateJob = () => {
+
     
-    <body class="bg-background text-foreground antialiased">
-        <!-- Header/Navigation -->
+  return (
+
+    
+    <div class="bg-background text-foreground antialiased">
+        {/*Header/Navigation */}
         <header
             class="sticky top-0 z-50 w-full border-b border-[hsl(var(--color-border))] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
         >
@@ -53,9 +58,9 @@
             </div>
         </header>
 
-        <!-- Main Content -->
+        {/*Main Content */}
         <main class="container mx-auto px-4 py-8 max-w-4xl">
-            <!-- Page Header -->
+            {/*Page Header */}
             <div class="mb-8">
                 <div
                     class="flex items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))] mb-2"
@@ -84,9 +89,9 @@
                 </div>
             </div>
 
-            <!-- Create Job Form -->
+            {/*Create Job Form */}
             <form class="space-y-6">
-                <!-- Basic Information -->
+                {/*Basic Information */}
                 <div class="card p-6">
                     <h2 class="text-xl font-semibold mb-6">
                         Basic Information
@@ -181,7 +186,7 @@
                     </div>
                 </div>
 
-                <!-- Location & Salary -->
+                {/*Location & Salary */}
                 <div class="card p-6">
                     <h2 class="text-xl font-semibold mb-6">
                         Location & Compensation
@@ -241,7 +246,7 @@
                     </div>
                 </div>
 
-                <!-- Job Description -->
+                {/*Job Description */}
                 <div class="card p-6">
                     <h2 class="text-xl font-semibold mb-6">Job Description</h2>
                     <div class="space-y-6">
@@ -290,7 +295,7 @@
                     </div>
                 </div>
 
-                <!-- Skills & Requirements -->
+                {/*Skills & Requirements */}
                 <div class="card p-6">
                     <h2 class="text-xl font-semibold mb-6">Required Skills</h2>
                     <div class="space-y-4">
@@ -384,7 +389,7 @@
                     </div>
                 </div>
 
-                <!-- Application Details -->
+                {/*Application Details */}
                 <div class="card p-6">
                     <h2 class="text-xl font-semibold mb-6">
                         Application Settings
@@ -420,7 +425,7 @@
                     </div>
                 </div>
 
-                <!-- Form Actions -->
+                {/*Form Actions */}
                 <div class="card p-6">
                     <div class="flex flex-col sm:flex-row gap-3">
                         <div class="flex-1"></div>
@@ -439,7 +444,7 @@
             </form>
         </main>
 
-        <!-- Footer -->
+        {/*Footer */}
         <footer
             class="border-t border-[hsl(var(--color-border))] bg-[hsl(var(--color-muted))]/30 mt-16"
         >
@@ -572,5 +577,10 @@
             // Initialize Lucide icons
             lucide.createIcons();
         </script>
-    </body>
-</html>
+    </div>
+
+
+  )
+}
+
+export default CreateJob

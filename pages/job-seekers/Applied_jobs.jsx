@@ -1,6 +1,8 @@
+import { Library } from 'lucide-react';
 import React from 'react'
 import { useState } from 'react';
 import {useEffect} from 'react';
+import { Link } from 'react-router-dom';
 
 
 const Applied_jobs = () => {
@@ -74,7 +76,7 @@ const handleFilterChange = (type ,value ) =>{
       <header className="sticky top-0 z-50 w-full border-b border-[hsl(var(--color-border))] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-8">
-            <a href="../index.html" className="flex items-center space-x-2">
+            <a href="../" className="flex items-center space-x-2">
               <i
                 data-lucide="briefcase"
                 className="h-8 w-8 text-[hsl(var(--color-primary))]"
@@ -88,12 +90,12 @@ const handleFilterChange = (type ,value ) =>{
               >
                 Jobs
               </a>
-              <a
-                href="user-dashboard.html"
+              <Link to="/user-dashboard" className="text-sm font-medium text-[hsl(var(--color-muted-foreground))] transition-colors hover:text-[hsl(var(--color-primary))]"
+                
                 className="text-sm font-medium text-[hsl(var(--color-muted-foreground))] transition-colors hover:text-[hsl(var(--color-primary))]"
               >
                 Dashboard
-              </a>
+              </Link>
               <a
                 href="applied-jobs.html"
                 className="text-sm font-medium text-[hsl(var(--color-primary))]"

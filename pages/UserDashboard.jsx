@@ -3,6 +3,7 @@ import HomePage from './Homepage'
 import UserNav from '../src/components/common/UserNav';
 import { useState } from 'react';
 import RecomenedJobCard from '../src/components/common/RecomenedJobCard';
+import { Link } from 'react-router-dom';
 const UserDashboard = () => {
 const [userData,setUserData]=useState(null);
 const [recomendedJobs,setRecomendedJobs]=useState([]);
@@ -349,8 +350,8 @@ const handleRecommendation = async () =>{
                             Quick Actions
                         </h3>
                         <div className="space-y-2">
-                            <a
-                                href="user-profile.html"
+                            <Link
+                                to="/user-profile"
                                 className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors"
                             >
                                 <i
@@ -360,11 +361,9 @@ const handleRecommendation = async () =>{
                                 <span className="text-sm font-medium"
                                     >View Profile</span
                                 >
-                            </a>
-                            <a
-                                href="edit-user-profile.html"
-                                className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors"
-                            >
+                            </Link>
+                            
+                            <Link to="/edit-profile" className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors">
                                 <i
                                     data-lucide="edit"
                                     className="h-5 w-5 text-[hsl(var(--color-muted-foreground))]"
@@ -372,11 +371,8 @@ const handleRecommendation = async () =>{
                                 <span className="text-sm font-medium"
                                     >Edit Profile</span
                                 >
-                            </a>
-                            <a
-                                href="applied-jobs.html"
-                                className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors"
-                            >
+                            </Link>
+                           <Link to="/my-applications" className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors">
                                 <i
                                     data-lucide="file-text"
                                     className="h-5 w-5 text-[hsl(var(--color-muted-foreground))]"
@@ -384,9 +380,9 @@ const handleRecommendation = async () =>{
                                 <span className="text-sm font-medium"
                                     >My Applications</span
                                 >
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link
+                                to="/saved-jobs"
                                 className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors"
                             >
                                 <i
@@ -396,9 +392,9 @@ const handleRecommendation = async () =>{
                                 <span className="text-sm font-medium"
                                     >Saved Jobs</span
                                 >
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link
+                                to="/settings"
                                 className="flex items-center gap-3 p-3 rounded-md hover:bg-[hsl(var(--color-accent))] transition-colors"
                             >
                                 <i
@@ -408,7 +404,7 @@ const handleRecommendation = async () =>{
                                 <span className="text-sm font-medium"
                                     >Settings</span
                                 >
-                            </a>
+                            </Link>
                         </div>
                     </div>
 
