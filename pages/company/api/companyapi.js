@@ -40,3 +40,25 @@ export const fetchApplicants = async (filters={}) => {
   });
   return applicants;
 };
+
+export const openPositionByslug= async (slug) => {
+    const token = localStorage.getItem("token");
+    const {data:openPositionsByslug} =await axios.get(`${BASE_URL}/${slug}/jobs`,{
+        headers:{
+            Authorization:`Bearer ${token}`}
+
+        })
+    
+
+    return openPositionsByslug
+}
+
+export const postJob =async (jobData)=>{
+    const token =localStorage.getItem("token");
+    const {data:postedJob}=await axios.post(`${BASE_URL}/jobs`,jobData,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    })
+    return postedJob;
+}

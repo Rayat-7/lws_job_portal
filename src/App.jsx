@@ -51,6 +51,8 @@ function App() {
             <Applied_jobs />
           </ProtectedRoute>
         } />
+        
+        {/* /// Role-Specific Protected Routes for Company */}
 
         <Route path="/company-dashboard" element={
           <ProtectedRoute allowedRole="COMPANY">

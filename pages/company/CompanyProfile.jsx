@@ -1,6 +1,11 @@
 import React from 'react'
+import { useCompanyProfile } from './api/useCompany';
+import { useOpenPositionByslug } from './api/useCompany';
 
 const CompanyProfile = () => {
+    const {data:company,loading,error} = useCompanyProfile();
+    const {data:jobopening}=useOpenPositionByslug(company?.data?.slug);
+    
   return (
     
 
@@ -42,11 +47,7 @@ const CompanyProfile = () => {
                     <a href="../login.html" className="btn btn-ghost text-sm"
                         >Sign In</a
                     >
-                    <a
-                        href="../register-company.html"
-                        className="btn btn-primary text-sm"
-                        >Post a Job</a
-                    >
+                    <a className="btn btn-primary text-sm" href="/create-job">Post a Job</a>
                 </div>
             </div>
         </header>
@@ -75,7 +76,7 @@ const CompanyProfile = () => {
                         >
                             <div>
                                 <h1 className="text-3xl font-bold mb-2">
-                                    TechCorp Solutions
+                                    {company?.data?.name || "Company Name"}
                                 </h1>
                                 <div
                                     className="flex flex-wrap items-center gap-3 text-[hsl(var(--color-muted-foreground))]"
@@ -85,7 +86,7 @@ const CompanyProfile = () => {
                                             data-lucide="building"
                                             className="h-4 w-4"
                                         ></i>
-                                        Technology & Software
+                                        {company?.data?.industry || "Industry"}
                                     </span>
                                     <span>•</span>
                                     <span className="flex items-center gap-1">
@@ -93,7 +94,7 @@ const CompanyProfile = () => {
                                             data-lucide="map-pin"
                                             className="h-4 w-4"
                                         ></i>
-                                        San Francisco, CA
+                                        {company?.data?.location || "Location"}
                                     </span>
                                     <span>•</span>
                                     <span className="flex items-center gap-1">
@@ -101,7 +102,7 @@ const CompanyProfile = () => {
                                             data-lucide="users"
                                             className="h-4 w-4"
                                         ></i>
-                                        500-1000 employees
+                                        {company?.data?.employeeCount || "500-1000 employees"}
                                     </span>
                                 </div>
                             </div>
@@ -131,12 +132,7 @@ const CompanyProfile = () => {
                             className="space-y-4 text-[hsl(var(--color-foreground))]"
                         >
                             <p>
-                                TechCorp Solutions is a leading technology
-                                company specializing in enterprise software
-                                solutions. Founded in 2010, we've grown from a
-                                small startup to a thriving organization with
-                                over 750 employees across multiple locations
-                                worldwide.
+                                {company?.data?.description || "TechCorp is a leading technology company specializing in software development, cloud computing, and AI solutions. Founded in 2010, we have grown to become a trusted partner for businesses worldwide."}
                             </p>
                             <p>
                                 Our mission is to empower businesses through
@@ -146,23 +142,7 @@ const CompanyProfile = () => {
                                 leverage cutting-edge technology to solve
                                 complex business challenges.
                             </p>
-                            <p>
-                                At TechCorp, we believe in fostering a culture
-                                of innovation, collaboration, and continuous
-                                learning. Our team consists of passionate
-                                professionals who are dedicated to creating
-                                products that make a real difference in the
-                                world. We invest heavily in our people,
-                                providing opportunities for growth, learning,
-                                and career advancement.
-                            </p>
-                            <p>
-                                We're proud to be recognized as one of the best
-                                places to work in the tech industry, with
-                                numerous awards for our workplace culture,
-                                employee benefits, and commitment to diversity
-                                and inclusion.
-                            </p>
+                           
                         </div>
                     </div>
 
@@ -277,8 +257,9 @@ const CompanyProfile = () => {
                             >
                         </div>
                         <div className="space-y-4">
-                            {/*Job Card 1 */}
-                            <article
+
+                            {jobopening?.data?.map((job)=>(
+                                <article key={job.id}
                                 className="border border-[hsl(var(--color-border))] rounded-lg p-4 hover:shadow-md transition-shadow"
                             >
                                 <div
@@ -289,7 +270,7 @@ const CompanyProfile = () => {
                                             <a
                                                 href="job-details.html"
                                                 className="hover:underline"
-                                                >Senior Full Stack Developer</a
+                                                >{job.title}</a
                                             >
                                         </h3>
                                         <div
@@ -302,7 +283,7 @@ const CompanyProfile = () => {
                                                     data-lucide="map-pin"
                                                     className="h-4 w-4"
                                                 ></i>
-                                                San Francisco, CA
+                                                {job.location}
                                             </span>
                                             <span>•</span>
                                             <span
@@ -312,7 +293,15 @@ const CompanyProfile = () => {
                                                     data-lucide="clock"
                                                     className="h-4 w-4"
                                                 ></i>
-                                                Posted 2 days ago
+                                                {/* //extract day from createdAt and display it in a human readable format */}
+                                               
+                                                {(() => {
+                                                    const postedDate = new Date(job.createdAt);
+                                                    const currentDate = new Date();
+                                                    const diffTime = Math.abs(currentDate - postedDate);
+                                                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                                    return `${diffDays} days ago`;
+                                                })()}
                                             </span>
                                             <span>•</span>
                                             <span
@@ -322,7 +311,7 @@ const CompanyProfile = () => {
                                                     data-lucide="users"
                                                     className="h-4 w-4"
                                                 ></i>
-                                                47 applicants
+                                                {job.applicants} applicants
                                             </span>
                                         </div>
                                     </div>
@@ -340,29 +329,19 @@ const CompanyProfile = () => {
                                 <p
                                     className="text-sm text-[hsl(var(--color-muted-foreground))] mb-3"
                                 >
-                                    We're looking for an experienced Full Stack
-                                    Developer to join our dynamic team. You'll
-                                    be working on cutting-edge web applications
-                                    using React, Node.js, and cloud
-                                    technologies.
+                                   {job.description}
                                 </p>
 
                                 <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="badge badge-secondary"
-                                        >Full-time</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Remote</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >React</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Node.js</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >TypeScript</span
-                                    >
+                                    
+                                    {job.skills.map((i)=>(
+                                    // <span key={i} className="badge badge-secondary"
+                                    //     >{i}</span
+                                     <span key={i} className="badge badge-secondary">{i}</span>
+                                    
+                                   ))}
+                                    
+                                    
                                 </div>
 
                                 <div
@@ -370,7 +349,7 @@ const CompanyProfile = () => {
                                 >
                                     <span
                                         className="text-sm font-semibold text-[hsl(var(--color-primary))]"
-                                        >$120k - $180k</span
+                                        >${job.salaryMin/1000}k - ${job.salaryMax/1000}k</span
                                     >
                                     <div className="flex gap-2">
                                         <a
@@ -384,325 +363,10 @@ const CompanyProfile = () => {
                                     </div>
                                 </div>
                             </article>
+                            ))}
+                            
 
-                            {/*Job Card 2 */}
-                            <article
-                                className="border border-[hsl(var(--color-border))] rounded-lg p-4 hover:shadow-md transition-shadow"
-                            >
-                                <div
-                                    className="flex items-start justify-between gap-4 mb-3"
-                                >
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-1">
-                                            <a
-                                                href="job-details.html"
-                                                className="hover:underline"
-                                                >DevOps Engineer</a
-                                            >
-                                        </h3>
-                                        <div
-                                            className="flex flex-wrap items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))]"
-                                        >
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="map-pin"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                Austin, TX
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="clock"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                Posted 1 week ago
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="users"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                61 applicants
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="btn-ghost p-2 flex-shrink-0"
-                                        title="Save job"
-                                    >
-                                        <i
-                                            data-lucide="bookmark"
-                                            className="h-5 w-5"
-                                        ></i>
-                                    </button>
-                                </div>
-
-                                <p
-                                    className="text-sm text-[hsl(var(--color-muted-foreground))] mb-3"
-                                >
-                                    Build and maintain our cloud infrastructure
-                                    using AWS, Kubernetes, and Terraform. Help
-                                    us scale our platform to serve millions of
-                                    users worldwide.
-                                </p>
-
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="badge badge-secondary"
-                                        >Full-time</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Remote</span
-                                    >
-                                    <span className="badge badge-outline">AWS</span>
-                                    <span className="badge badge-outline"
-                                        >Kubernetes</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Docker</span
-                                    >
-                                </div>
-
-                                <div
-                                    className="flex items-center justify-between pt-3 border-t border-[hsl(var(--color-border))]"
-                                >
-                                    <span
-                                        className="text-sm font-semibold text-[hsl(var(--color-primary))]"
-                                        >$130k - $170k</span
-                                    >
-                                    <div className="flex gap-2">
-                                        <a
-                                            href="job-details.html"
-                                            className="btn btn-outline text-sm"
-                                            >View Details</a
-                                        >
-                                        <button className="btn btn-primary text-sm">
-                                            Apply Now
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
-
-                            {/*Job Card 3 */}
-                            <article
-                                className="border border-[hsl(var(--color-border))] rounded-lg p-4 hover:shadow-md transition-shadow"
-                            >
-                                <div
-                                    className="flex items-start justify-between gap-4 mb-3"
-                                >
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-1">
-                                            <a
-                                                href="job-details.html"
-                                                className="hover:underline"
-                                                >Product Manager</a
-                                            >
-                                        </h3>
-                                        <div
-                                            className="flex flex-wrap items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))]"
-                                        >
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="map-pin"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                San Francisco, CA
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="clock"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                Posted 3 days ago
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="users"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                38 applicants
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="btn-ghost p-2 flex-shrink-0"
-                                        title="Save job"
-                                    >
-                                        <i
-                                            data-lucide="bookmark"
-                                            className="h-5 w-5"
-                                        ></i>
-                                    </button>
-                                </div>
-
-                                <p
-                                    className="text-sm text-[hsl(var(--color-muted-foreground))] mb-3"
-                                >
-                                    Lead product strategy and execution for our
-                                    enterprise platform. Work with engineering,
-                                    design, and stakeholders to deliver
-                                    exceptional products.
-                                </p>
-
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="badge badge-secondary"
-                                        >Full-time</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Hybrid</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Product Strategy</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Agile</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Leadership</span
-                                    >
-                                </div>
-
-                                <div
-                                    className="flex items-center justify-between pt-3 border-t border-[hsl(var(--color-border))]"
-                                >
-                                    <span
-                                        className="text-sm font-semibold text-[hsl(var(--color-primary))]"
-                                        >$140k - $190k</span
-                                    >
-                                    <div className="flex gap-2">
-                                        <a
-                                            href="job-details.html"
-                                            className="btn btn-outline text-sm"
-                                            >View Details</a
-                                        >
-                                        <button className="btn btn-primary text-sm">
-                                            Apply Now
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
-
-                            {/*Job Card 4 */}
-                            <article
-                                className="border border-[hsl(var(--color-border))] rounded-lg p-4 hover:shadow-md transition-shadow"
-                            >
-                                <div
-                                    className="flex items-start justify-between gap-4 mb-3"
-                                >
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-1">
-                                            <a
-                                                href="job-details.html"
-                                                className="hover:underline"
-                                                >UI/UX Designer</a
-                                            >
-                                        </h3>
-                                        <div
-                                            className="flex flex-wrap items-center gap-2 text-sm text-[hsl(var(--color-muted-foreground))]"
-                                        >
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="map-pin"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                New York, NY
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="clock"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                Posted 5 days ago
-                                            </span>
-                                            <span>•</span>
-                                            <span
-                                                className="flex items-center gap-1"
-                                            >
-                                                <i
-                                                    data-lucide="users"
-                                                    className="h-4 w-4"
-                                                ></i>
-                                                29 applicants
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <button
-                                        className="btn-ghost p-2 flex-shrink-0"
-                                        title="Save job"
-                                    >
-                                        <i
-                                            data-lucide="bookmark"
-                                            className="h-5 w-5"
-                                        ></i>
-                                    </button>
-                                </div>
-
-                                <p
-                                    className="text-sm text-[hsl(var(--color-muted-foreground))] mb-3"
-                                >
-                                    Design intuitive and beautiful user
-                                    experiences for our suite of products.
-                                    Experience with Figma and design systems
-                                    required.
-                                </p>
-
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                    <span className="badge badge-secondary"
-                                        >Full-time</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Remote</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Figma</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Design Systems</span
-                                    >
-                                    <span className="badge badge-outline"
-                                        >Prototyping</span
-                                    >
-                                </div>
-
-                                <div
-                                    className="flex items-center justify-between pt-3 border-t border-[hsl(var(--color-border))]"
-                                >
-                                    <span
-                                        className="text-sm font-semibold text-[hsl(var(--color-primary))]"
-                                        >$90k - $140k</span
-                                    >
-                                    <div className="flex gap-2">
-                                        <a
-                                            href="job-details.html"
-                                            className="btn btn-outline text-sm"
-                                            >View Details</a
-                                        >
-                                        <button className="btn btn-primary text-sm">
-                                            Apply Now
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
+                            
                         </div>
 
                         {/*View All Jobs */}
@@ -741,7 +405,7 @@ const CompanyProfile = () => {
                                         href="https://www.techcorp.com"
                                         className="text-sm font-medium text-[hsl(var(--color-primary))] hover:underline"
                                     >
-                                        www.techcorp.com
+                                        {company?.data?.websiteUrl || "www.techcorp.com"}
                                     </a>
                                 </div>
                             </div>
@@ -760,7 +424,7 @@ const CompanyProfile = () => {
                                         href="mailto:careers@techcorp.com"
                                         className="text-sm font-medium text-[hsl(var(--color-primary))] hover:underline"
                                     >
-                                        careers@techcorp.com
+                                        {company?.data?.hrEmail || "careers@techcorp.com"}
                                     </a>
                                 </div>
                             </div>
