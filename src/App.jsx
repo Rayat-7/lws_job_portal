@@ -15,7 +15,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import CreateJob from '../pages/company/CreateJob'
 import CompanyProfile from '../pages/company/CompanyProfile'
 import createJob from '../pages/company/CreateJob'
-
+import ManageJob from '../pages/company/ManageJob'
+import Testmanagejob from '../pages/company/Testmanagejob'
 function App() {
  const queryClient = new QueryClient()
 
@@ -51,8 +52,8 @@ function App() {
             <Applied_jobs />
           </ProtectedRoute>
         } />
-        
-        {/* /// Role-Specific Protected Routes for Company */}
+
+  {/* /// Role-Specific Protected Routes for Company */}
 
         <Route path="/company-dashboard" element={
           <ProtectedRoute allowedRole="COMPANY">
@@ -68,6 +69,16 @@ function App() {
         <Route path="/create-job" element={
           <ProtectedRoute allowedRole="COMPANY">
             <CreateJob />
+          </ProtectedRoute>
+        } />
+        <Route path="/manage-job" element={
+          <ProtectedRoute allowedRole="COMPANY">
+            <ManageJob />
+          </ProtectedRoute>
+        } />
+        <Route path="/testmanagejob" element={
+          <ProtectedRoute allowedRole="COMPANY">
+            <Testmanagejob />
           </ProtectedRoute>
         } />
 

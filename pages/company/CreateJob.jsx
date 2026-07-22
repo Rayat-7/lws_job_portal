@@ -1,35 +1,57 @@
-import React from 'react'
+import React, { useState } from 'react'
 import * as yup from 'yup';
-import {useForm,Controller} from 'react-hook-form';
+import {useForm, useWatch} from 'react-hook-form';
 import {usePostJob} from './api/useCompany';
 import {yupResolver} from '@hookform/resolvers/yup';
 
- const schema =yup.object().shape({
-        title:yup.string().required("Job title is required"),
-        type:yup.string().required("Job type is required"),
-        workMode:yup.string().required("Work mode is required"),
-        workMode:yup.string().required("Work mode is required"),
-        category:yup.string().required("Category is required"),
-        experienceLevel:yup.string().required("Experience level is required"),
-        salaryMin:yup.number().min(0,"Minimum salary must be a positive number"),
-        salaryMax:yup.number().min(yup.ref('salaryMin'),"Maximum salary must be greater than or equal to minimum salary"),
-        salaryPeriod:yup.string().required("Salary period is required"),
-        description:yup.string().required("Job description is required"),
-        requirements:yup.string().required("Requirements are required"),
-        benefits:yup.string(),
-        skills:yup.array().of(yup.string()).min(1,"At least one skill is required"),
-        vacancies:yup.number().positive().required("Number of vacancies is required"),
-        deadline:yup.date().required("Deadline is required"),
-    })
+const jobTypeOptions = ['Full-time', 'Part-time', 'Contract', 'Freelance', 'Internship'];
+const workModeOptions = ['Remote', 'On-site', 'Hybrid'];
+const categoryOptions = ['Engineering', 'Design', 'Product', 'Marketing', 'Sales', 'HR', 'Finance', 'Other'];
+const experienceOptions = ['Entry', 'Mid', 'Senior', 'Expert', 'Lead'];
+const salaryPeriodOptions = ['Hourly', 'Daily', 'Weekly', 'Monthly', 'Yearly'];
+
+const schema = yup.object().shape({
+    title: yup.string().trim().required('Job title is required'),
+    type: yup.string().oneOf(jobTypeOptions, 'Select a valid job type').required('Job type is required'),
+    workMode: yup.string().oneOf(workModeOptions, 'Select a valid work mode').required('Work mode is required'),
+    location: yup.string().trim().required('Location is required'),
+    category: yup.string().oneOf(categoryOptions, 'Select a valid category').required('Category is required'),
+    experienceLevel: yup.string().oneOf(experienceOptions, 'Select a valid experience level').required('Experience level is required'),
+    salaryMin: yup
+        .number()
+        .transform((value, originalValue) => (originalValue === '' || Number.isNaN(value) ? undefined : value))
+        .min(0, 'Minimum salary must be a positive number')
+        .nullable(),
+    salaryMax: yup
+        .number()
+        .transform((value, originalValue) => (originalValue === '' || Number.isNaN(value) ? undefined : value))
+        .nullable()
+        .when('salaryMin', (salaryMin, schema) => (salaryMin != null ? schema.min(salaryMin, 'Maximum salary must be greater than or equal to minimum salary') : schema)),
+    salaryPeriod: yup.string().oneOf(salaryPeriodOptions, 'Select a valid salary period').required('Salary period is required'),
+    description: yup.string().trim().required('Job description is required'),
+    requirements: yup.string().trim().required('Requirements are required'),
+    benefits: yup.string().trim().nullable(),
+    skills: yup.array().of(yup.string().trim().min(1)).min(1, 'At least one skill is required').required('At least one skill is required'),
+    vacancies: yup
+        .number()
+        .transform((value, originalValue) => (originalValue === '' || Number.isNaN(value) ? undefined : value))
+        .integer('Number of vacancies must be a whole number')
+        .positive('Number of vacancies must be greater than 0')
+        .required('Number of vacancies is required'),
+    deadline: yup.date().typeError('Deadline is required').required('Deadline is required'),
+})
 
 
 const CreateJob = () => {
     const {mutate,isLoading,isError,error} = usePostJob()
+    const [skillInput, setSkillInput] = useState('')
 
     const{
         register,
         handleSubmit,
         control,
+        setValue,
+        getValues,
         reset,
         formState:{errors},
     }=useForm({
@@ -38,6 +60,7 @@ const CreateJob = () => {
         title:"",
         type:"",
         workMode:"",
+        location:"",
         category:"",
         experienceLevel:"",
         salaryMin:"",
@@ -52,10 +75,50 @@ const CreateJob = () => {
         }
     });
 
+    const skills = useWatch({
+        control,
+        name: 'skills',
+    }) || []
+
+    const handleAddSkill = () => {
+        const nextSkill = skillInput.trim();
+
+        if (!nextSkill) {
+            return;
+        }
+
+        const currentSkills = getValues('skills') || [];
+        const isDuplicate = currentSkills.some((skill) => skill.toLowerCase() === nextSkill.toLowerCase());
+
+        if (isDuplicate) {
+            setSkillInput('');
+            return;
+        }
+
+        setValue('skills', [...currentSkills, nextSkill], {
+            shouldValidate: true,
+            shouldDirty: true,
+        });
+        setSkillInput('');
+    }
+
+    const handleRemoveSkill = (skillToRemove) => {
+        const currentSkills = getValues('skills') || [];
+        setValue(
+            'skills',
+            currentSkills.filter((skill) => skill !== skillToRemove),
+            { shouldValidate: true, shouldDirty: true }
+        );
+    }
+
     const onSubmit = (data) =>{
-        mutate(data,{
+        mutate({
+            ...data,
+            skills,
+        },{
             onSuccess:()=>{
                 reset();
+                setSkillInput('');
                 alert("Job posted successfully");
             },
         })
@@ -162,12 +225,14 @@ const CreateJob = () => {
                                 >Job Title *</label
                             >
                             <input
+                            {...register("title")}
                                 type="text"
                                 id="jobTitle"
                                 className="input"
                                 placeholder="e.g. Senior Full Stack Developer"
-                                required
+                                
                             />
+                            {errors.title && <p className="text-red-500">{errors.title.message}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -175,72 +240,58 @@ const CreateJob = () => {
                                 <label for="jobType" className="label block mb-2"
                                     >Job Type *</label
                                 >
-                                <select id="jobType" className="select" required>
+                                <select {...register("type")} id="jobType" className="select" required>
                                     <option value="">Select job type</option>
-                                    <option value="full-time">Full-time</option>
-                                    <option value="part-time">Part-time</option>
-                                    <option value="contract">Contract</option>
-                                    <option value="freelance">Freelance</option>
-                                    <option value="internship">
-                                        Internship
-                                    </option>
+                                    {jobTypeOptions.map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
                                 </select>
+                                {errors.type && <p className="text-red-500">{errors.type.message}</p>}
                             </div>
 
                             <div>
-                                <label for="workMode" className="label block mb-2"
+                                <label htmlFor="workMode" className="label block mb-2"
                                     >Work Mode *</label
                                 >
-                                <select id="workMode" className="select" required>
+                                <select {...register("workMode")} id="workMode" className="select" required>
                                     <option value="">Select work mode</option>
-                                    <option value="on-site">On-site</option>
-                                    <option value="remote">Remote</option>
-                                    <option value="hybrid">Hybrid</option>
+                                    {workModeOptions.map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
                                 </select>
+                                {errors.workMode && <p className="text-red-500">{errors.workMode.message}</p>}
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="category" className="label block mb-2"
+                                <label htmlFor="category" className="label block mb-2"
                                     >Category *</label
                                 >
-                                <select id="category" className="select" required>
+                                <select {...register("category")} id="category" className="select" required>
                                     <option value="">Select category</option>
-                                    <option value="engineering">
-                                        Engineering
-                                    </option>
-                                    <option value="design">Design</option>
-                                    <option value="product">Product</option>
-                                    <option value="marketing">Marketing</option>
-                                    <option value="sales">Sales</option>
-                                    <option value="hr">Human Resources</option>
-                                    <option value="finance">Finance</option>
-                                    <option value="other">Other</option>
+                                    {categoryOptions.map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
                                 </select>
+                                {errors.category && <p className="text-red-500">{errors.category.message}</p>}
                             </div>
 
                             <div>
-                                <label for="experience" className="label block mb-2"
+                                <label htmlFor="experienceLevel" className="label block mb-2"
                                     >Experience Level *</label
                                 >
-                                <select id="experience" className="select" required>
+                                <select {...register("experienceLevel")} id="experienceLevel" className="select" required>
                                     <option value="">
                                         Select experience level
                                     </option>
-                                    <option value="entry">
-                                        Entry Level (0-2 years)
-                                    </option>
-                                    <option value="mid">
-                                        Mid Level (2-5 years)
-                                    </option>
-                                    <option value="senior">
-                                        Senior Level (5-10 years)
-                                    </option>
-                                    <option value="lead">
-                                        Lead (10+ years)
-                                    </option>
+                                    {experienceOptions.map((option) => (
+                                        <option key={option} value={option}>
+                                            {option === 'Entry' ? 'Entry Level (0-2 years)' : option === 'Mid' ? 'Mid Level (2-5 years)' : option === 'Senior' ? 'Senior Level (5-10 years)' : option === 'Expert' ? 'Expert Level (10+ years)' : 'Lead (10+ years)'}
+                                        </option>
+                                    ))}
                                 </select>
+                                {errors.experienceLevel && <p className="text-red-500">{errors.experienceLevel.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -254,53 +305,59 @@ const CreateJob = () => {
                     <div className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label for="city" className="label block mb-2"
+                                <label htmlFor="location" className="label block mb-2"
                                     >Location *</label
                                 >
                                 <input
                                     type="text"
-                                    id="city"
+                                    {...register("location")}
+                                    id="location"
                                     className="input"
                                     placeholder="e.g. San Francisco"
                                     required
                                 />
+                                {errors.location && <p className="text-red-500">{errors.location.message}</p>}
                             </div>
 
                             <div>
-                                <label for="salaryMin" className="label block mb-2"
+                                <label htmlFor="salaryMin" className="label block mb-2"
                                     >Minimum Salary ($)</label
                                 >
                                 <input
                                     type="number"
-                                    id="salaryMin"
+                                    {...register("salaryMin", { valueAsNumber: true })}
                                     className="input"
                                     placeholder="e.g. 100000"
                                 />
+                                {errors.salaryMin && <p className="text-red-500">{errors.salaryMin.message}</p>}
                             </div>
 
                             <div>
-                                <label for="salaryMax" className="label block mb-2"
+                                <label htmlFor="salaryMax" className="label block mb-2"
                                     >Maximum Salary ($)</label
                                 >
                                 <input
                                     type="number"
-                                    id="salaryMax"
+                                    {...register("salaryMax", { valueAsNumber: true })}
                                     className="input"
                                     placeholder="e.g. 150000"
                                 />
+                                {errors.salaryMax && <p className="text-red-500">{errors.salaryMax.message}</p>}
                             </div>
 
                             <div>
                                 <label
-                                    for="salaryPeriod"
+                                    htmlFor="salaryPeriod"
                                     className="label block mb-2"
                                     >Salary Period</label
                                 >
-                                <select id="salaryPeriod" className="select">
-                                    <option value="yearly">Yearly</option>
-                                    <option value="monthly">Monthly</option>
-                                    <option value="hourly">Hourly</option>
+                                <select {...register("salaryPeriod")} id="salaryPeriod" className="select">
+                                    <option value="">Select salary period</option>
+                                    {salaryPeriodOptions.map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
                                 </select>
+                                {errors.salaryPeriod && <p className="text-red-500">{errors.salaryPeriod.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -311,11 +368,11 @@ const CreateJob = () => {
                     <h2 className="text-xl font-semibold mb-6">Job Description</h2>
                     <div className="space-y-6">
                         <div>
-                            <label for="description" className="label block mb-2"
+                            <label htmlFor="description" className="label block mb-2"
                                 >Job Description *</label
                             >
                             <textarea
-                                id="description"
+                                {...register("description")}
                                 className="textarea"
                                 rows="8"
                                 placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
@@ -330,27 +387,31 @@ const CreateJob = () => {
                         </div>
 
                         <div>
-                            <label for="requirements" className="label block mb-2"
+                            <label htmlFor="requirements" className="label block mb-2"
                                 >Requirements & Qualifications</label
                             >
                             <textarea
+                                {...register("requirements")}
                                 id="requirements"
                                 className="textarea"
                                 rows="6"
                                 placeholder="List the required skills, qualifications, and experience..."
                             ></textarea>
+                            {errors.requirements && <p className="text-red-500">{errors.requirements.message}</p>}
                         </div>
 
                         <div>
-                            <label for="benefits" className="label block mb-2"
+                            <label htmlFor="benefits" className="label block mb-2"
                                 >Benefits & Perks</label
                             >
                             <textarea
+                                {...register("benefits")}
                                 id="benefits"
                                 className="textarea"
                                 rows="5"
                                 placeholder="Describe the benefits, perks, and what makes your company a great place to work..."
                             ></textarea>
+                            {errors.benefits && <p className="text-red-500">{errors.benefits.message}</p>}
                         </div>
                     </div>
                 </div>
@@ -360,17 +421,24 @@ const CreateJob = () => {
                     <h2 className="text-xl font-semibold mb-6">Required Skills</h2>
                     <div className="space-y-4">
                         <div>
-                            <label for="skillInput" className="label block mb-2"
+                            <label htmlFor="skillInput" className="label block mb-2"
                                 >Add Skills *</label
                             >
                             <div className="flex gap-2">
                                 <input
                                     type="text"
-                                    id="skillInput"
+                                    value={skillInput}
+                                    onChange={(event) => setSkillInput(event.target.value)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === 'Enter') {
+                                            event.preventDefault();
+                                            handleAddSkill();
+                                        }
+                                    }}
                                     className="input flex-1"
                                     placeholder="Type a skill and press Add"
                                 />
-                                <button type="button" className="btn btn-primary">
+                                <button type="button" onClick={handleAddSkill} className="btn btn-primary">
                                     <i
                                         data-lucide="plus"
                                         className="h-4 w-4 mr-2"
@@ -389,63 +457,28 @@ const CreateJob = () => {
                         <div>
                             <label className="label block mb-3">Added Skills</label>
                             <div className="flex flex-wrap gap-2">
-                                <span
-                                    className="badge badge-secondary inline-flex items-center gap-1"
-                                >
-                                    JavaScript
-                                    <button
-                                        type="button"
-                                        className="hover:text-red-600"
+                                {skills.length > 0 ? skills.map((skill) => (
+                                    <span
+                                        key={skill}
+                                        className="badge badge-secondary inline-flex items-center gap-1"
                                     >
-                                        <i data-lucide="x" className="h-3 w-3"></i>
-                                    </button>
-                                </span>
-                                <span
-                                    className="badge badge-secondary inline-flex items-center gap-1"
-                                >
-                                    React
-                                    <button
-                                        type="button"
-                                        className="hover:text-red-600"
-                                    >
-                                        <i data-lucide="x" className="h-3 w-3"></i>
-                                    </button>
-                                </span>
-                                <span
-                                    className="badge badge-secondary inline-flex items-center gap-1"
-                                >
-                                    Node.js
-                                    <button
-                                        type="button"
-                                        className="hover:text-red-600"
-                                    >
-                                        <i data-lucide="x" className="h-3 w-3"></i>
-                                    </button>
-                                </span>
-                                <span
-                                    className="badge badge-secondary inline-flex items-center gap-1"
-                                >
-                                    MongoDB
-                                    <button
-                                        type="button"
-                                        className="hover:text-red-600"
-                                    >
-                                        <i data-lucide="x" className="h-3 w-3"></i>
-                                    </button>
-                                </span>
-                                <span
-                                    className="badge badge-secondary inline-flex items-center gap-1"
-                                >
-                                    AWS
-                                    <button
-                                        type="button"
-                                        className="hover:text-red-600"
-                                    >
-                                        <i data-lucide="x" className="h-3 w-3"></i>
-                                    </button>
-                                </span>
+                                        {skill}
+                                        <button
+                                            type="button"
+                                            className="hover:text-red-600"
+                                            onClick={() => handleRemoveSkill(skill)}
+                                        >
+                                            <i data-lucide="x" className="h-3 w-3"></i>
+                                        </button>
+                                    </span>
+                                )) : (
+                                    <p className="text-sm text-[hsl(var(--color-muted-foreground))]">
+                                        No skills added yet.
+                                    </p>
+                                )}
                             </div>
                         </div>
+                        {errors.skills && <p className="text-red-500">{errors.skills.message}</p>}
                     </div>
                 </div>
 
@@ -462,24 +495,27 @@ const CreateJob = () => {
                                 >
                                 <input
                                     type="number"
+                                    {...register("vacancies", { valueAsNumber: true })}
                                     id="vacancies"
                                     className="input"
                                     placeholder="e.g. 2"
-                                    value="1"
                                     min="1"
                                 />
+                                {errors.vacancies && <p className="text-red-500">{errors.vacancies.message}</p>}
                             </div>
 
                             <div>
-                                <label for="deadline" className="label block mb-2"
+                                <label htmlFor="deadline" className="label block mb-2"
                                     >Application Deadline *</label
                                 >
                                 <input
                                     type="date"
+                                    {...register("deadline")}
                                     id="deadline"
                                     className="input"
                                     required
                                 />
+                                {errors.deadline && <p className="text-red-500">{errors.deadline.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -489,15 +525,20 @@ const CreateJob = () => {
                 <div className="card p-6">
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="flex-1"></div>
+                        {isError && error?.message && (
+                            <p className="text-sm text-red-500 sm:mr-auto sm:self-center">
+                                {error.message}
+                            </p>
+                        )}
                         <a
                             href="company-dashboard.html"
                             className="btn btn-outline"
                         >
                             Cancel
                         </a>
-                        <button type="submit" className="btn btn-primary">
+                        <button type="submit" className="btn btn-primary" disabled={isLoading}>
                             <i data-lucide="send" className="h-4 w-4 mr-2"></i>
-                            Publish Job
+                            {isLoading ? 'Publishing...' : 'Publish Job'}
                         </button>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import { useQuery,useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
     fetchCompanyProfile,
     fetchDashboardStats, 
@@ -41,12 +41,13 @@ export const useOpenPositionByslug=(slug)=>{
         queryFn:()=>openPositionByslug(slug)
     })
 }
-export const usePostJob =(jobData)=>{
+export const usePostJob =()=>{
+    const queryClient = useQueryClient();
+
     return useMutation({
         mutationFn:postJob,
         onSuccess:()=>{
-            // Invalidate and refetch
             queryClient.invalidateQueries({ queryKey: ['companyjobs'] })
-          }
+        }
     })
 }

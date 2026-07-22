@@ -55,7 +55,7 @@ export const openPositionByslug= async (slug) => {
 
 export const postJob =async (jobData)=>{
     const token =localStorage.getItem("token");
-    const {data:postedJob}=await axios.post(`${BASE_URL}/jobs`,jobData,{
+    const {data:postedJob}=await axios.post(`http://localhost:5000/api/jobs`,jobData,{
         headers:{
             Authorization:`Bearer ${token}`
         }
