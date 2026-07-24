@@ -62,3 +62,33 @@ export const postJob =async (jobData)=>{
     })
     return postedJob;
 }
+
+export const updateJob=async(jobData)=>{
+    const token= localStorage.storage.getItem("token");
+    const {data:postedJob} =await axios.post(`http://localhost:5000/api/jobs/${jobId}`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    })
+    return updatedJob;
+
+}
+
+export const deleteJob=async(jobId)=>{
+    const token =localStorage.getItem("token");
+    const {data:deletedJob} =await axios.delete(`http://localhost:5000/api/jobs/${jobId}`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    })
+    return deletedJob;
+}
+export const getJobById=async(jobId)=>{
+    const token =localStorage.getItem("token");
+    const {data} =await axios.get(`http://localhost:5000/api/jobs/${jobId}`,{
+        headers:{
+            Authorization:`Bearer ${token}`
+        }
+    })
+    return data;
+}

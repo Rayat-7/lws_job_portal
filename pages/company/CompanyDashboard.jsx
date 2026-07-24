@@ -261,19 +261,19 @@ const CompanyDashboard = () => {
             <div className="card p-6">
               <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
               <div className="space-y-2">
-                <a href="#" className="btn btn-primary w-full justify-start">
+                <a href="/create-job" className="btn btn-primary w-full justify-start">
                   <i data-lucide="plus" className="h-4 w-4 mr-2"></i>
                   Post New Job
                 </a>
-                <a href="#" className="btn btn-outline w-full justify-start">
+                <a href="/manage-job" className="btn btn-outline w-full justify-start">
                   <i data-lucide="list" className="h-4 w-4 mr-2"></i>
                   Manage Jobs
                 </a>
-                <a href="#" className="btn btn-outline w-full justify-start">
+                <a href="/applicants" className="btn btn-outline w-full justify-start">
                   <i data-lucide="users" className="h-4 w-4 mr-2"></i>
                   View Applicants
                 </a>
-                <a href="#" className="btn btn-outline w-full justify-start">
+                <a href="/company-settings" className="btn btn-outline w-full justify-start">
                   <i data-lucide="settings" className="h-4 w-4 mr-2"></i>
                   Company Settings
                 </a>

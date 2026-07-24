@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from 'react'
-import { useJobs } from './api/useCompany'
+import { useJobs,useUpdateJob,useDeleteJob } from './api/useCompany'
+import {Link,useNavigate} from 'react-router-dom'
+import Editjob from './Editjob'
 //icon import
 // import { Lucide } from '@/base-components'
 
@@ -12,7 +14,21 @@ const ManageJob = () => {
     const [searchTerm, setSearchTerm] = useState('')
     const [statusFilter, setStatusFilter] = useState('all')
     const [sortOrder, setSortOrder] = useState('newest')
-    const [currentPage, setCurrentPage] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [selectedJob, setSelectedJob] = useState(null);
+      const deleteJobMutation = useDeleteJob();
+
+    const deleteJob = (jobId) => {
+        console.log("Delete job with ID:", jobId);
+        // Implement your delete logic here, e.g., call an API to delete the job
+        deleteJobMutation.mutate(jobId);
+
+
+    }
+    const handleEditjob = (job) => {
+        console.log("Edit job with ID:", job);
+    }
+    
 
     const allJobs = useMemo(() => jobs?.data || [], [jobs])
 
@@ -240,11 +256,11 @@ const ManageJob = () => {
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button className="btn-ghost p-2" title="Edit" type="button">
-                                                        <i data-lucide="edit" className="h-4 w-4"></i>
+                                                    <button onClick={()=>setSelectedJob(job)} className="btn-ghost p-2 text-blue-600" title="Edit" type="button">
+                                                        Edit
                                                     </button>
-                                                    <button className="btn-ghost p-2 text-red-600" title="Delete" type="button">
-                                                        <i data-lucide="trash-2" className="h-4 w-4"></i>
+                                                    <button  onClick={()=>deleteJob(job.id)} className="btn-ghost p-2 text-red-600" title="Delete" type="button">
+                                                        Delete
                                                     </button>
                                                 </div>
                                             </td>
@@ -351,8 +367,15 @@ const ManageJob = () => {
                     </div>
                 </div>
             </footer>
+            {selectedJob && (
+                <Editjob className="p-4 absolute bg-blue-400" job={selectedJob} onClose={() => setSelectedJob(null)} />
+            )}
         </div>
     )
 }
 
 export default ManageJob
+
+
+
+

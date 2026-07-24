@@ -5,7 +5,11 @@ import {
     fetchJobs,
     fetchApplicants ,
     openPositionByslug,
-    postJob} from "./companyapi";
+    postJob,
+    getJobById,
+    updateJob,
+    deleteJob
+} from "./companyapi";
 
 export  const useCompanyProfile= ()=>{
     return useQuery({
@@ -49,5 +53,31 @@ export const usePostJob =()=>{
         onSuccess:()=>{
             queryClient.invalidateQueries({ queryKey: ['companyjobs'] })
         }
+    })
+}
+
+export const useUpdateJob =(jobId)=>{
+    const queryClient =useQueryClient();
+    return useMutation({
+        mutationFn:(updatedJobaData)=>updateJob(jobId,updatedJobaData),
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:['companyjobs']})
+        }
+    })
+}
+export const useDeleteJob =()=>{
+    const queryClient=useQueryClient();
+    return useMutation({
+        mutationFn:(jobId)=>deleteJob(jobId),
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:['companyjobs']})
+        }
+
+    })
+}
+export const usegetJobById=(jobId)=>{
+    return useQuery({
+        queryKey:["job",jobId],
+        queryFn:()=>getJobById(jobId)
     })
 }

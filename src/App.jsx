@@ -17,6 +17,7 @@ import CompanyProfile from '../pages/company/CompanyProfile'
 import createJob from '../pages/company/CreateJob'
 import ManageJob from '../pages/company/ManageJob'
 import Testmanagejob from '../pages/company/Testmanagejob'
+import Editjob from '../pages/company/Editjob'
 function App() {
  const queryClient = new QueryClient()
 
@@ -79,6 +80,11 @@ function App() {
         <Route path="/testmanagejob" element={
           <ProtectedRoute allowedRole="COMPANY">
             <Testmanagejob />
+          </ProtectedRoute>
+        } />
+        <Route path="/edit-job/:jobId" element={
+          <ProtectedRoute allowedRole="COMPANY">
+            <Editjob />
           </ProtectedRoute>
         } />
 
