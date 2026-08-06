@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Dropdown from '../src/components/ui/Dropdown'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { useApplyForJob } from './job-seekers/api/useUser'
 const API_BASE_URL = 'http://localhost:5000'
 
 const createEmptyFilters = () => ({
@@ -96,8 +97,12 @@ const HomePage = () => {
     const [appliedSearchTerm, setAppliedSearchTerm] = useState('')
     const [appliedFilters, setAppliedFilters] = useState(createEmptyFilters())
     const [appliedSortOption, setAppliedSortOption] = useState('Most Recent')
+    
+
 
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+    const [currentJobId, setCurrentJobId] = useState(null)
+    const applyMutation = useApplyForJob()
 
   const toggleDropdown = (dropdownId) => {
     setOpenDropdown((current) => (current === dropdownId ? null : dropdownId))
@@ -275,12 +280,13 @@ const HomePage = () => {
                 lucide.createIcons();
             }
 
-            function handleApplyNowClick() {
+            function handleApplyNowClick(jobId) {
                 if (!localStorage.getItem('token')) {
                     navigate('/login')
                     return
                 }
 
+                setCurrentJobId(jobId || null)
                 openApplyDialog()
             }
 
@@ -359,24 +365,26 @@ const HomePage = () => {
                 document.getElementById("resumeInput").click();
             }
 
-          
-            function submitApplication() {
-                if (!uploadedFile) {
-                    alert("Please upload your resume");
+            async function submitApplication() {
+                // if (!uploadedFile) {
+                //     alert("Please upload your resume");
+                //     return;
+                // }
+
+                const coverLetter = document.getElementById("coverMessage").value;
+
+                if (!currentJobId) {
+                    alert('No job selected to apply for');
                     return;
                 }
 
-                const coverMessage =
-                    document.getElementById("coverMessage").value;
-
-                // Here you would typically send the data to your server
-                console.log("Application submitted:", {
-                    resume: uploadedFile.name,
-                    coverMessage: coverMessage,
-                });
-
-                alert("Application submitted successfully!");
-                closeApplyDialog();
+                try {
+                    await applyMutation.mutateAsync({ jobId: currentJobId, coverLetter });
+                    alert('Application submitted successfully!');
+                    closeApplyDialog();
+                } catch (err) {
+                    alert('Failed to submit application: ' + (err?.response?.data?.message || err.message || 'Unknown'))
+                }
             }
 
   return (
@@ -732,7 +740,7 @@ const HomePage = () => {
                                                     >
                                                         View Details
                                                     </a>
-                                                    <button className="btn btn-primary text-sm" onClick={handleApplyNowClick}>
+                                                    <button className="btn btn-primary text-sm" onClick={() => handleApplyNowClick(job.id)}>
                                                         {localStorage.getItem('token') ? 'Apply Now' : 'Sign in to Apply'}
                                                     </button>
                                                 </div>

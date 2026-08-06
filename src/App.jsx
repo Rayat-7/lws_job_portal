@@ -18,6 +18,8 @@ import createJob from '../pages/company/CreateJob'
 import ManageJob from '../pages/company/ManageJob'
 import Testmanagejob from '../pages/company/Testmanagejob'
 import Editjob from '../pages/company/Editjob'
+import AllApplicants from '../pages/company/AllApplicants'
+import AllPositions from '../pages/company/AllPositions'
 function App() {
  const queryClient = new QueryClient()
 
@@ -90,7 +92,17 @@ function App() {
 
         {/* Default route */}
         <Route path="/" element={<HomePage/>} />
-        
+        <Route path='/applicants' element={
+          <ProtectedRoute allowedRole="COMPANY">
+            <AllApplicants/>
+          </ProtectedRoute>}
+        />
+
+         <Route path='/alljobs' element={
+          <ProtectedRoute allowedRole="COMPANY">
+            <AllPositions/>
+          </ProtectedRoute>}
+        />
       </Routes>
        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

@@ -92,3 +92,5 @@ export const getJobById=async(jobId)=>{
     })
     return data;
 }
+
+// export const getAllApplicants= async()

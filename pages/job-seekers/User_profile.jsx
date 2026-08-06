@@ -1,10 +1,53 @@
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useUser } from '../../src/context/useUser'
-
+import { useUploadResume } from './api/useUser';
 const User_profile = () => {
     const user = useUser();
     console.log('User from context:', user?.data?.name);
     if (!user) return <p>Loading...</p>;
+
+    const [resumeName, setResumeName] = useState(user?.data?.resumeOriginalName || 'No resume uploaded');
+    const [uploading, setUploading] = useState(false);
+    const resumeInputRef = useRef(null);
+    const uploadMutation = useUploadResume();
+
+    useEffect(() => {
+        if (user?.data?.resumeOriginalName) setResumeName(user.data.resumeOriginalName);
+    }, [user]);
+
+    const handleResumeChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!validTypes.includes(file.type)) {
+            alert('Please upload a valid PDF, DOC, or DOCX file');
+            e.target.value = '';
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            e.target.value = '';
+            return;
+        }
+
+        setUploading(true);
+
+        uploadMutation.mutate({ file }, {
+            onSuccess: (res) => {
+                setUploading(false);
+                const name = res?.data?.resumeOriginalName || file.name;
+                setResumeName(name);
+                if (resumeInputRef.current) resumeInputRef.current.value = '';
+                alert('Resume uploaded successfully');
+            },
+            onError: (err) => {
+                setUploading(false);
+                alert('Upload failed: ' + (err?.response?.data?.message || err.message || 'Unknown'));
+            },
+        });
+    };
 
 //     function formatDate(dateString) {
 //   if (!dateString) return "Present"; // handle ongoing jobs
@@ -393,7 +436,7 @@ const User_profile = () => {
                             <div
                                 className="p-4 bg-[hsl(var(--color-secondary))] rounded-lg"
                             >
-                                <div className="flex items-center gap-3 mb-3">
+                                                <div className="flex items-center gap-3 mb-3">
                                     <div
                                         className="h-12 w-12 rounded-lg bg-white flex items-center justify-center flex-shrink-0"
                                     >
@@ -402,40 +445,52 @@ const User_profile = () => {
                                             className="h-6 w-6 text-[hsl(var(--color-primary))]"
                                         ></i>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-sm truncate">
-                                            John_Doe_Resume.pdf
-                                        </p>
-                                        <p
-                                            className="text-xs text-[hsl(var(--color-muted-foreground))]"
-                                        >
-                                            Updated Nov 28, 2025
-                                        </p>
-                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="font-medium text-sm truncate">
+                                                            {resumeName}
+                                                        </p>
+                                                        <p
+                                                            className="text-xs text-[hsl(var(--color-muted-foreground))]"
+                                                        >
+                                                            {user?.data?.resumeUploadDate ? new Date(user.data.resumeUploadDate).toLocaleDateString() : 'Not uploaded'}
+                                                        </p>
+                                                    </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <a
-                                        href="#"
-                                        className="btn btn-outline w-full text-xs h-9"
-                                    >
-                                        <i
-                                            data-lucide="download"
-                                            className="h-3 w-3 mr-2"
-                                        ></i>
-                                        Download
-                                    </a>
+                                                    <a
+                                                        href={user?.data?.resumeUrl || '#'}
+                                                        className="btn btn-outline w-full text-xs h-9"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        <i
+                                                            data-lucide="download"
+                                                            className="h-3 w-3 mr-2"
+                                                        ></i>
+                                                        Download
+                                                    </a>
                                 </div>
                             </div>
-                            <a
-                                href="edit-user-profile.html"
-                                className="btn btn-outline w-full"
-                            >
-                                <i
-                                    data-lucide="upload"
-                                    className="h-4 w-4 mr-2"
-                                ></i>
-                                Update Resume
-                            </a>
+                                            <div>
+                                                <input
+                                                    ref={resumeInputRef}
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                    className="hidden"
+                                                    onChange={(e) => handleResumeChange(e)}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline w-full"
+                                                    onClick={() => resumeInputRef.current?.click()}
+                                                >
+                                                    <i
+                                                        data-lucide="upload"
+                                                        className="h-4 w-4 mr-2"
+                                                    ></i>
+                                                    {uploading ? 'Uploading...' : 'Update Resume'}
+                                                </button>
+                                            </div>
                         </div>
                     </div>
 
